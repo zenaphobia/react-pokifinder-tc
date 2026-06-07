@@ -84,20 +84,6 @@ export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
             />
           </div>
 
-          {/* {!spriteUrl ? (
-            <img
-              className="object-contain mx-auto"
-              src="./pokeball.svg"
-              alt=""
-            />
-          ) : (
-            <img
-              className="object-contain mx-auto"
-              src={spriteUrl}
-              alt={`image of ${pokemon.name}`}
-            ></img>
-          )} */}
-
           {!isPending && (
             <div className="flex gap-1.5 justify-center mt-1 flex-wrap">
               {data?.types.map((t) => (
