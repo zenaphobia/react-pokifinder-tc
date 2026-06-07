@@ -1,21 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useGlobalStore } from "./stores/globals";
-import { useEffect, useState } from "react";
 import PokeList from "./components/PokeList";
 import { SearchBar } from "./components/SearchBar";
 function App() {
   const { data, isPending, error } = useQuery({
-    queryKey: ["pokemon", "1"],
+    queryKey: ["speciesList"],
     queryFn: () =>
-      fetch(`https://pokeapi.co/api/v2/pokemon?limit=100000`).then((res) =>
-        res.json(),
+      // Species (not /pokemon) so filter namespaces align and alternate forms
+      // don't clutter the list. Cards resolve each species' default form.
+      fetch(`https://pokeapi.co/api/v2/pokemon-species?limit=100000`).then(
+        (res) => res.json(),
       ),
+    staleTime: Infinity,
   });
   const setQuery = useGlobalStore((s) => s.setQuery);
 
-  useEffect(() => {
-    console.log({ data });
-  }, [data]);
   return (
     <div className="container mx-auto h-screen overflow-hidden space-y-4 p-4">
       <header className="flex items-center gap-3">

@@ -13,17 +13,7 @@ export interface Filters {
   eggGroup: string[];
   color: string[];
   shape: string[];
-  stats: {
-    hp: StatRange;
-    attack: StatRange;
-    defense: StatRange;
-    specialAttack: StatRange;
-    specialDefense: StatRange;
-    speed: StatRange;
-  };
 }
-
-export type StatKey = keyof Filters["stats"];
 
 const defaultStatRange = (): StatRange => [STAT_MIN, STAT_MAX];
 
@@ -34,22 +24,15 @@ const defaultFilters = (): Filters => ({
   eggGroup: [],
   color: [],
   shape: [],
-  stats: {
-    hp: defaultStatRange(),
-    attack: defaultStatRange(),
-    defense: defaultStatRange(),
-    specialAttack: defaultStatRange(),
-    specialDefense: defaultStatRange(),
-    speed: defaultStatRange(),
-  },
 });
+
+export type DropdownField = keyof Omit<Filters, "stats">;
 
 interface GlobalState {
   query: string;
   filters: Filters;
   setQuery: (query: string) => void;
-  toggleFilter: (key: keyof Omit<Filters, "stats">, value: string) => void;
-  setStatRange: (stat: StatKey, range: StatRange) => void;
+  toggleFilter: (key: DropdownField, value: string) => void;
   resetFilters: () => void;
   reset: () => void;
 }
@@ -68,14 +51,6 @@ export const useGlobalStore = create<GlobalState>((set) => ({
         : [...current, value];
       return { filters: { ...state.filters, [key]: next } };
     }),
-
-  setStatRange: (stat, range) =>
-    set((state) => ({
-      filters: {
-        ...state.filters,
-        stats: { ...state.filters.stats, [stat]: range },
-      },
-    })),
 
   resetFilters: () => set({ filters: defaultFilters() }),
 

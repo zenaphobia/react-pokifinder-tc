@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Pokemon } from "pokenode-ts";
 import Skeleton from "./Skeleton";
 import { Dialog, Flex } from "@radix-ui/themes";
+import { twMerge } from "tailwind-merge";
 
 const STAT_LABELS: Record<string, string> = {
   hp: "HP",
@@ -14,16 +15,36 @@ const STAT_LABELS: Record<string, string> = {
   speed: "Speed",
 };
 
+type SpeciesDetail = {
+  varieties: { is_default: boolean; pokemon: { name: string; url: string } }[];
+};
+
 export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
-  const { data, isPending, error } = useQuery<Pokemon>({
-    queryKey: ["pokemon", pokemon.name],
+  const { data: species, isPending: speciesPending } = useQuery<SpeciesDetail>({
+    queryKey: ["species", pokemon.name],
     queryFn: () => fetch(pokemon.url).then((res) => res.json()),
+    staleTime: Infinity,
   });
+
+  const formUrl =
+    species?.varieties.find((v) => v.is_default)?.pokemon.url ??
+    species?.varieties[0]?.pokemon.url;
+
+  const { data, isPending: formPending } = useQuery<Pokemon>({
+    queryKey: ["pokemon", pokemon.name],
+    queryFn: () => fetch(formUrl!).then((res) => res.json()),
+    enabled: Boolean(formUrl),
+    staleTime: Infinity,
+  });
+
+  const isPending = speciesPending || formPending;
 
   const spriteUrl =
     data?.sprites.other?.["official-artwork"]?.front_default ??
     data?.sprites.front_default ??
     undefined;
+
+  const [imageReady, setImageReady] = useState(false);
 
   return (
     <Dialog.Root>
@@ -42,15 +63,40 @@ export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
             )}
           </div>
 
-          {isPending ? (
-            <div className="font-bold uppercase">Loading</div>
+          <div className="relative flex items-center justify-center">
+            {!imageReady && (
+              <img
+                className="object-contain opacity-50 mx-auto absolute left-0 top-0"
+                src="/pokeball.svg"
+                alt=""
+              />
+            )}
+            <img
+              className={twMerge(
+                "opacity-0 object-contain h-[258px] w-[258px] mx-auto transition-opacity",
+                imageReady && "opacity-100",
+              )}
+              src={spriteUrl}
+              onLoad={() => {
+                setImageReady(true);
+              }}
+              alt=""
+            />
+          </div>
+
+          {/* {!spriteUrl ? (
+            <img
+              className="object-contain mx-auto"
+              src="./pokeball.svg"
+              alt=""
+            />
           ) : (
             <img
               className="object-contain mx-auto"
               src={spriteUrl}
               alt={`image of ${pokemon.name}`}
             ></img>
-          )}
+          )} */}
 
           {!isPending && (
             <div className="flex gap-1.5 justify-center mt-1 flex-wrap">
@@ -78,7 +124,10 @@ export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
             </span>
           )}
         </Dialog.Title>
-        <Dialog.Description size="2" className="font-bold! uppercase opacity-60">
+        <Dialog.Description
+          size="2"
+          className="font-bold! uppercase opacity-60"
+        >
           Base stats and details
         </Dialog.Description>
 
