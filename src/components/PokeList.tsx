@@ -27,20 +27,25 @@ export default function PokeList({
 
   return (
     <div className="h-full">
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 h-[90%] overflow-y-auto">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 h-[75%] overflow-y-auto">
         {visiblePokemon.map((p) => (
           <PokemonCard key={p.url} pokemon={p} />
         ))}
       </div>
 
       <footer className="flex items-center justify-center gap-4 h-[10%]">
-        <button onClick={() => setPage((p) => p - 1)} disabled={page === 0}>
+        <button
+          className="brutal-sm brutal-press bg-white px-4 py-2 font-bold uppercase"
+          onClick={() => setPage((p) => p - 1)}
+          disabled={page === 0}
+        >
           Previous
         </button>
-        <span>
+        <span className="brutal-sm bg-yellow-300 px-4 py-2 font-bold uppercase">
           Page {page + 1} of {pageCount}
         </span>
         <button
+          className="brutal-sm brutal-press bg-white px-4 py-2 font-bold uppercase"
           onClick={() => setPage((p) => p + 1)}
           disabled={page >= pageCount - 1}
         >

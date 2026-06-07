@@ -1,1 +1,49 @@
 @import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #fdf0d5;
+    color: #000;
+    font-family:
+      "Helvetica Neue",
+      Arial,
+      system-ui,
+      sans-serif;
+    background-image: radial-gradient(#00000018 1.5px, transparent 1.5px);
+    background-size: 16px 16px;
+  }
+}
+
+/* Neo-brutalist building blocks */
+@utility brutal {
+  border: 3px solid #000;
+  border-radius: 0;
+  box-shadow: 5px 5px 0 0 #000;
+}
+
+@utility brutal-sm {
+  border: 2px solid #000;
+  border-radius: 0;
+  box-shadow: 3px 3px 0 0 #000;
+}
+
+/* Press/lift interaction for clickable brutalist elements */
+@utility brutal-press {
+  transition:
+    transform 75ms ease,
+    box-shadow 75ms ease;
+
+  &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0 0 #000;
+  }
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 #000;
+  }
+  &:disabled {
+    transform: none;
+    box-shadow: 3px 3px 0 0 #000;
+    opacity: 0.4;
+  }
+}
