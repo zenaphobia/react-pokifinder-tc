@@ -66,7 +66,7 @@ export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
           <div className="relative flex items-center justify-center">
             {!imageReady && (
               <img
-                className="object-contain opacity-50 mx-auto absolute left-0 top-0"
+                className="object-contain opacity-25 mx-auto absolute left-0 top-0"
                 src="/pokeball.svg"
                 alt=""
               />
