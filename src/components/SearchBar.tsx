@@ -40,12 +40,13 @@ function Dropdown({ dropdownField }: { dropdownField: DropdownField }) {
 
   const { data, isPending } = useQuery<{ results: NamedAPIResource[] }>({
     queryKey: [slug, "options"],
-    queryFn: () =>
+    queryFn: async () => {
       // `limit` must clear the option count — abilities alone are 300+, and the
       // API defaults to 20.
-      fetch(`https://pokeapi.co/api/v2/${slug}?limit=1000`).then((res) =>
-        res.json(),
-      ),
+      const res = await fetch(`https://pokeapi.co/api/v2/${slug}?limit=1350`);
+      if (!res.ok) throw new Error(`Failed to load ${slug} options: ${res.status}`);
+      return res.json();
+    },
     staleTime: Infinity,
   });
 

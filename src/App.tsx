@@ -5,12 +5,18 @@ import { SearchBar } from "./components/SearchBar";
 function App() {
   const { data, isPending } = useQuery({
     queryKey: ["speciesList"],
-    queryFn: () =>
+    queryFn: async () => {
       // Species (not /pokemon) so filter namespaces align and alternate forms
       // don't clutter the list. Cards resolve each species' default form.
-      fetch(`https://pokeapi.co/api/v2/pokemon-species?limit=100000`).then(
-        (res) => res.json(),
-      ),
+      const res = await fetch(
+        `https://pokeapi.co/api/v2/pokemon-species?limit=100000`,
+      );
+
+      if (!res.ok)
+        throw new Error("[app.tsx:speciesList] Failed to fetch species");
+
+      return await res.json();
+    },
     staleTime: Infinity,
   });
   const setQuery = useGlobalStore((s) => s.setQuery);

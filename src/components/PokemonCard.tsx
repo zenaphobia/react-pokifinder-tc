@@ -22,7 +22,11 @@ type SpeciesDetail = {
 export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
   const { data: species, isPending: speciesPending } = useQuery<SpeciesDetail>({
     queryKey: ["species", pokemon.name],
-    queryFn: () => fetch(pokemon.url).then((res) => res.json()),
+    queryFn: async () => {
+      const res = await fetch(pokemon.url);
+      if (!res.ok) throw new Error(`Failed to load species ${pokemon.name}: ${res.status}`);
+      return res.json();
+    },
     staleTime: Infinity,
   });
 
@@ -32,7 +36,11 @@ export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
 
   const { data, isPending: formPending } = useQuery<Pokemon>({
     queryKey: ["pokemon", pokemon.name],
-    queryFn: () => fetch(formUrl!).then((res) => res.json()),
+    queryFn: async () => {
+      const res = await fetch(formUrl!);
+      if (!res.ok) throw new Error(`Failed to load form ${pokemon.name}: ${res.status}`);
+      return res.json();
+    },
     enabled: Boolean(formUrl),
     staleTime: Infinity,
   });
