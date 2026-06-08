@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import type { PokemonBare } from "../types";
 import { PokemonCard } from "./PokemonCard";
 import { useGlobalStore } from "../stores/globals";
 import { useFilterSets } from "../hooks/useFilterSets";
+import type { NamedResource, PokemonBare } from "../schemas";
+import * as v from "valibot";
 
 const AMOUNT_PER_PAGE = 20;
 

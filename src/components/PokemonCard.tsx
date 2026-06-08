@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PokemonBare } from "../types";
+import type { PokemonBare } from "../schemas";
 import { useQuery } from "@tanstack/react-query";
 import Skeleton from "./Skeleton";
 import { Dialog, Flex } from "@radix-ui/themes";
