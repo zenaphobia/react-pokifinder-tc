@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Button, DropdownMenu } from "@radix-ui/themes";
+import { DropdownMenu } from "@radix-ui/themes";
 import type { NamedAPIResource } from "pokenode-ts";
 import { useGlobalStore, type DropdownField } from "../stores/globals";
 import { FILTER_CONFIG, FILTER_FIELDS } from "../filters";
