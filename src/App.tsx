@@ -3,7 +3,7 @@ import { useGlobalStore } from "./stores/globals";
 import PokeList from "./components/PokeList";
 import { SearchBar } from "./components/SearchBar";
 function App() {
-  const { data, isPending, error } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["speciesList"],
     queryFn: () =>
       // Species (not /pokemon) so filter namespaces align and alternate forms

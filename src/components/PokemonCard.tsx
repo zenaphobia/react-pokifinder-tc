@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { PokemonBare } from "../types";
 import { useQuery } from "@tanstack/react-query";
 import type { Pokemon } from "pokenode-ts";

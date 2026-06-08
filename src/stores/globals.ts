@@ -15,8 +15,6 @@ export interface Filters {
   shape: string[];
 }
 
-const defaultStatRange = (): StatRange => [STAT_MIN, STAT_MAX];
-
 const defaultFilters = (): Filters => ({
   type: [],
   generation: [],
