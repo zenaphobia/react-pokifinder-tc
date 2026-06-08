@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { PokemonBare } from "../types";
 import { useQuery } from "@tanstack/react-query";
-import type { Pokemon } from "pokenode-ts";
 import Skeleton from "./Skeleton";
 import { Dialog, Flex } from "@radix-ui/themes";
 import { twMerge } from "tailwind-merge";
+import * as v from "valibot";
+import { NamedResource } from "../schemas";
 
 const STAT_LABELS: Record<string, string> = {
   hp: "HP",
@@ -15,31 +16,59 @@ const STAT_LABELS: Record<string, string> = {
   speed: "Speed",
 };
 
-type SpeciesDetail = {
-  varieties: { is_default: boolean; pokemon: { name: string; url: string } }[];
-};
+const SpeciesSchema = v.object({
+  varieties: v.array(
+    v.object({
+      is_default: v.boolean(),
+      pokemon: v.object({ name: v.string(), url: v.string() }),
+    }),
+  ),
+});
+
+const FormSchema = v.object({
+  id: v.number(),
+  sprites: v.object({
+    front_default: v.nullable(v.string()),
+    other: v.optional(
+      v.object({
+        "official-artwork": v.optional(
+          v.object({ front_default: v.nullable(v.string()) }),
+        ),
+      }),
+    ),
+  }),
+  types: v.array(v.object({ type: NamedResource })),
+  stats: v.array(v.object({ stat: NamedResource, base_stat: v.number() })),
+  height: v.number(),
+  weight: v.number(),
+  abilities: v.array(v.object({ ability: NamedResource })),
+});
 
 export function PokemonCard({ pokemon }: { pokemon: PokemonBare }) {
-  const { data: species, isPending: speciesPending } = useQuery<SpeciesDetail>({
+  const { data: species, isPending: speciesPending } = useQuery({
     queryKey: ["species", pokemon.name],
     queryFn: async () => {
       const res = await fetch(pokemon.url);
-      if (!res.ok) throw new Error(`Failed to load species ${pokemon.name}: ${res.status}`);
-      return res.json();
+      if (!res.ok)
+        throw new Error(
+          `Failed to load species ${pokemon.name}: ${res.status}`,
+        );
+      return v.parse(SpeciesSchema, await res.json());
     },
     staleTime: Infinity,
   });
 
   const formUrl =
-    species?.varieties.find((v) => v.is_default)?.pokemon.url ??
+    species?.varieties.find((variety) => variety.is_default)?.pokemon.url ??
     species?.varieties[0]?.pokemon.url;
 
-  const { data, isPending: formPending } = useQuery<Pokemon>({
+  const { data, isPending: formPending } = useQuery({
     queryKey: ["pokemon", pokemon.name],
     queryFn: async () => {
       const res = await fetch(formUrl!);
-      if (!res.ok) throw new Error(`Failed to load form ${pokemon.name}: ${res.status}`);
-      return res.json();
+      if (!res.ok)
+        throw new Error(`Failed to load form ${pokemon.name}: ${res.status}`);
+      return v.parse(FormSchema, await res.json());
     },
     enabled: Boolean(formUrl),
     staleTime: Infinity,
