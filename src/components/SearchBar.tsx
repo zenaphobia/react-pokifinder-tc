@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { DropdownMenu } from "@radix-ui/themes";
+import { Button, DropdownMenu } from "@radix-ui/themes";
 import type { NamedAPIResource } from "pokenode-ts";
 import { useGlobalStore, type DropdownField } from "../stores/globals";
 import { FILTER_CONFIG, FILTER_FIELDS } from "../filters";
@@ -8,11 +8,12 @@ import { FILTER_CONFIG, FILTER_FIELDS } from "../filters";
 const HIDDEN_VALUES = new Set(["unknown", "shadow"]);
 
 export function SearchBar({ onChange }: { onChange: (input: string) => void }) {
+  const resetFilters = useGlobalStore((s) => s.resetFilters);
   return (
-    <div className="space-y-3">
+    <div className="flex flex-col lg:flex-row gap-4">
       <input
         placeholder="SEARCH POKÉMON..."
-        className="brutal w-full lg:w-[500px] bg-white px-4 py-3 font-bold uppercase tracking-wide placeholder:text-black/40 focus:outline-none focus:bg-yellow-300"
+        className="brutal w-full lg:w-[500px] h-max bg-white px-4 py-3 font-bold uppercase tracking-wide placeholder:text-black/40 focus:outline-none focus:bg-yellow-300"
         onChange={(e) => {
           onChange(e.currentTarget.value);
         }}
@@ -21,6 +22,12 @@ export function SearchBar({ onChange }: { onChange: (input: string) => void }) {
         {FILTER_FIELDS.map((field) => (
           <Dropdown key={field} dropdownField={field} />
         ))}
+        <button
+          onClick={resetFilters}
+          className="brutal brutal-press flex items-center gap-2 px-4 py-3 text-sm font-bold uppercase tracking-wide bg-red-500 text-white"
+        >
+          Reset
+        </button>
       </div>
     </div>
   );
@@ -74,7 +81,7 @@ function Dropdown({ dropdownField }: { dropdownField: DropdownField }) {
               onSelect={(e) => e.preventDefault()}
               className={`cursor-pointer rounded-none! font-bold uppercase tracking-wide data-highlighted:bg-yellow-300! data-highlighted:text-black! ${
                 checked
-                  ? "bg-red-500! text-white! data-highlighted:bg-red-500! data-highlighted:text-white!"
+                  ? "bg-red-500! text-white! data-highlighted:bg-red-500!"
                   : ""
               }`}
             >

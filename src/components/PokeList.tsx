@@ -35,7 +35,7 @@ export default function PokeList({
 
   return (
     <div className="h-full">
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 h-[70%] overflow-y-auto">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 h-[50%] lg:h-[75%] overflow-y-auto">
         {visiblePokemon.map((p) => (
           <PokemonCard key={p.url} pokemon={p} />
         ))}
