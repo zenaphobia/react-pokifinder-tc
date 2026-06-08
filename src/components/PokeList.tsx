@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { PokemonCard } from "./PokemonCard";
 import { useGlobalStore } from "../stores/globals";
 import { useFilterSets } from "../hooks/useFilterSets";
-import type { NamedResource, PokemonBare } from "../schemas";
-import * as v from "valibot";
+import type { PokemonBare } from "../schemas";
 
 const AMOUNT_PER_PAGE = 20;
 
@@ -30,6 +29,7 @@ export default function PokeList({
 
   useEffect(() => {
     if (page > 0 && page >= pageCount) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPage(0);
     }
   }, [page, pageCount]);
