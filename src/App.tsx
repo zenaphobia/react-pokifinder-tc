@@ -2,8 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useGlobalStore } from "./stores/globals";
 import PokeList from "./components/PokeList";
 import { SearchBar } from "./components/SearchBar";
+import * as v from "valibot";
+import { NamedResourceList } from "./schemas";
+
 function App() {
-  const { data, isPending } = useQuery({
+  const { data } = useQuery({
     queryKey: ["speciesList"],
     queryFn: async () => {
       // Species (not /pokemon) so filter namespaces align and alternate forms
@@ -15,7 +18,7 @@ function App() {
       if (!res.ok)
         throw new Error("[app.tsx:speciesList] Failed to fetch species");
 
-      return await res.json();
+      return v.parse(NamedResourceList, await res.json());
     },
     staleTime: Infinity,
   });
@@ -33,7 +36,7 @@ function App() {
           setQuery(s);
         }}
       />
-      {isPending ? (
+      {!data ? (
         <div className="brutal inline-block bg-yellow-300 px-4 py-2 font-bold uppercase">
           Loading...
         </div>

@@ -1,14 +1,19 @@
 import type { DropdownField } from "./stores/globals";
+import * as v from "valibot";
 
 // `/type` and `/ability` list Pokémon *forms*; the others list *species*.
 // Both response shapes get flattened to a plain list of names.
-type FormMembership = { pokemon: { pokemon: { name: string } }[] };
-type SpeciesMembership = { pokemon_species: { name: string }[] };
+export const FormMembershipSchema = v.object({
+  pokemon: v.array(v.object({ pokemon: v.object({ name: v.string() }) })),
+});
+export const SpeciesMembershipSchema = v.object({
+  pokemon_species: v.array(v.object({ name: v.string() })),
+});
 
-const fromForms = (data: unknown) =>
-  (data as FormMembership).pokemon.map((p) => p.pokemon.name);
-const fromSpecies = (data: unknown) =>
-  (data as SpeciesMembership).pokemon_species.map((s) => s.name);
+export const fromForms = (data: unknown) =>
+  v.parse(FormMembershipSchema, data).pokemon.map((p) => p.pokemon.name);
+export const fromSpecies = (data: unknown) =>
+  v.parse(SpeciesMembershipSchema, data).pokemon_species.map((s) => s.name);
 
 export interface FilterConfig {
   label: string;

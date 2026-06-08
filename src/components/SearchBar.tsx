@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { DropdownMenu } from "@radix-ui/themes";
-import type { NamedAPIResource } from "pokenode-ts";
 import { useGlobalStore, type DropdownField } from "../stores/globals";
 import { FILTER_CONFIG, FILTER_FIELDS } from "../filters";
+import { NamedResourceList } from "../schemas";
+import * as v from "valibot";
 
 // `unknown` and `shadow` aren't real battle types — hide them from the picker.
 const HIDDEN_VALUES = new Set(["unknown", "shadow"]);
@@ -38,20 +39,21 @@ function Dropdown({ dropdownField }: { dropdownField: DropdownField }) {
   const selected = useGlobalStore((s) => s.filters[dropdownField]);
   const toggleFilter = useGlobalStore((s) => s.toggleFilter);
 
-  const { data, isPending } = useQuery<{ results: NamedAPIResource[] }>({
+  const { data, isPending } = useQuery({
     queryKey: [slug, "options"],
     queryFn: async () => {
       // `limit` must clear the option count — abilities alone are 300+, and the
       // API defaults to 20.
       const res = await fetch(`https://pokeapi.co/api/v2/${slug}?limit=1350`);
-      if (!res.ok) throw new Error(`Failed to load ${slug} options: ${res.status}`);
-      return res.json();
+      if (!res.ok)
+        throw new Error(`Failed to load ${slug} options: ${res.status}`);
+      return v.parse(NamedResourceList, await res.json());
     },
     staleTime: Infinity,
   });
 
   const options = (data?.results ?? []).filter(
-    (v) => !HIDDEN_VALUES.has(v.name),
+    (option) => !HIDDEN_VALUES.has(option.name),
   );
 
   const hasSelection = selected.length > 0;
@@ -71,13 +73,13 @@ function Dropdown({ dropdownField }: { dropdownField: DropdownField }) {
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Content className="max-h-80! overflow-y-auto! rounded-none! border-[3px]! border-black! bg-[#fdf0d5]! p-1! shadow-[5px_5px_0_0_#000]!">
-        {options.map((v) => {
-          const checked = selected.includes(v.name);
+        {options.map((option) => {
+          const checked = selected.includes(option.name);
           return (
             <DropdownMenu.CheckboxItem
-              key={v.name}
+              key={option.name}
               checked={checked}
-              onCheckedChange={() => toggleFilter(dropdownField, v.name)}
+              onCheckedChange={() => toggleFilter(dropdownField, option.name)}
               // Keep the menu open so several can be checked in one go.
               onSelect={(e) => e.preventDefault()}
               className={`cursor-pointer rounded-none! font-bold uppercase tracking-wide data-highlighted:bg-yellow-300! data-highlighted:text-black! ${
@@ -86,7 +88,7 @@ function Dropdown({ dropdownField }: { dropdownField: DropdownField }) {
                   : ""
               }`}
             >
-              {v.name.replace(/-/g, " ")}
+              {option.name.replace(/-/g, " ")}
             </DropdownMenu.CheckboxItem>
           );
         })}
